@@ -41,6 +41,13 @@ void FILEO::set_path_in_cd(std::string user_input, std::string & path)
         return;
     }
 
+    // changing '/' -> '\'
+    int tmp_count_symbols = path_f.length();
+    for (int i = 0; i <= tmp_count_symbols; i++) {
+        if (path_f[i] == '/')
+            path_f[i] = '\\';
+    }
+
     path = path_f;
 }
 

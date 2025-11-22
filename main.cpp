@@ -1,14 +1,28 @@
 #include <iostream>
 #include <random>
 
+// date
+#include <chrono>
+#include <format>
+#include <iomanip>
+
 #include <locale>
 #include <codecvt>
 
-#include "helper_header/helper_text.h"
+//
+// console
+//
 #include "helper_header/console/helper_clear_console.h"
-#include "helper_header/work_with_files/helper_open_file.h"
 #include "helper_header/console/color_console.h"
 #include "helper_header/console/debug_some_command.h"
+#include "helper_header/console/helper_for_help.h"
+#include "helper_header/console/date_and_time.h"
+#include "helper_header/console/CMDCOMMAND.h"
+
+//
+// files
+//
+#include "helper_header/work_with_files/helper_open_file.h"
 #include "helper_header/work_with_txt/helper_txt.h"
 #include "helper_header/work_with_files/helper_rename_files.h"
 #include "helper_header/helper_for_find_folder_file/helper_for_find_FF.h"
@@ -25,17 +39,20 @@ int main()
     bool isRunDebug = true;
     bool isShowPathWhenStartLoop = true;
 
+    std::vector<std::string> history {};
+
     std::string path = "/", user_input;
     std::cout << "for help type help" << std::endl;
 
-    while (isRun)
-    {
+    while (isRun) {
         if (isShowPathWhenStartLoop)
             std::cout << path << " >>";
         else
             std::cout << "$ ";
 
         std::getline(std::cin, user_input);
+
+        history.push_back(user_input);
 
         if (user_input == "exit" || user_input == "ex")
         {
@@ -57,11 +74,11 @@ int main()
         else if (user_input == "help" || user_input == "-h" || user_input == "--help")
         {
             std::cout << "help / -h / --help - just help" << std::endl;
+            std::cout << "help -d / help --date" << std::endl;
             std::cout << "help full / -fll / --full - for advanced help" << std::endl;
             std::cout << "help color / col / -col / --color - help for change color" << std::endl;
             std::cout << "help file / -f / --file - help for command file" << std::endl;
             std::cout << "help txt / text / -t / --txt - help for command txt" << std::endl;
-            std::cout << "help console / cons / -cons / --console - help for command console" << std::endl;
             std::cout << "help console / cons / -cons / --console - help for command console" << std::endl;
         }
 
@@ -69,46 +86,11 @@ int main()
         {
             if (user_input.substr(5) == "full" || user_input.substr(5) == "-fll"
                 || user_input.substr(5) == "--full") {
-                std::cout << std::endl;
-                std::cout << "clear / cls - clearing the console" << std::endl;
-                std::cout << "info - information about this program" << std::endl;
-                std::cout << std::endl;
-                std::cout << "show path / -s -p / --show --path - to display the path in the console" << std::endl;
-                std::cout << "show path / -s -p / --show --path - to display the path in the console" << std::endl;
-                std::cout << "pwd - get path" << std::endl;
-                std::cout << std::endl;
-                std::cout << "color ... <- (here name of color) - for change color in console" << std::endl;
-                std::cout << "color help - to check the available colors" << std::endl;
-                std::cout << std::endl;
-                std::cout << "exit / ex - for exit from console" << std::endl;
-                std::cout << std::endl;
-                std::cout << "cd - the command to change the working directory" << std::endl;
-                std::cout << "dir - allows you to display a list of files and subdirectories "
-                         "for the specified directory (for windows)" << std::endl;
-                std::cout << std::endl;
-                std::cout << "echo ... <- (here text to you want to write) - first you need to write path in cd ..." << std::endl;
-                std::cout << "echo clear - for clear text in text file" << std::endl;
-                std::cout << "read - for read txt file (first you need to write path in cd ...)" << std::endl;
-                std::cout << std::endl;
-                std::cout << "openf ... <- (path with file or just folder) - "
-                         "opening a file or folder through OS programs (for all OS)" << std::endl;
-                std::cout << "open ... <- (path) - allows you to display "
-                         "a list of files and subdirectories for the specified directory (for all OS)" << std::endl;
-                std::cout << std::endl;
-                std::cout << "rnm / rename / mv ... <- (new_name) - the command to rename a file / folder "
-                             "(first, enter the path to the cd, only then you can change the name of the "
-                             "file or folder)" << std::endl;
-                std::cout << std::endl;
-                std::cout << "find ... <- (name file / folder) - first you need to specify "
-                         "the path via cd, then you can search for a file / folder" << std::endl;
-                std::cout << std::endl;
-                std::cout << "create / cr ... <- (path) ... <- (file or folder) ... <- "
-                         "(name file / folder) - the command to create a file or folder" << std::endl;
-                std::cout << std::endl;
-                std::cout << "delete / del ... <- (1 option: name file / folder or 2 option: "
-                         "first you need to specify the path via cd, then just write delete) - "
-                         "delete file / folder" << std::endl;
-            }
+                helper_for_help::get_help_full();
+                }
+
+            else if (user_input.substr(5) == "-d" || user_input.substr(5) == "--date")
+                helper_for_help::get_help_date();
 
             else if (user_input.substr(5) == "color" || user_input.substr(5) == "--color"
                 || user_input.substr(5) == "-col" || user_input.substr(5) == "col")
@@ -116,49 +98,17 @@ int main()
 
             else if (user_input.substr(5) == "file" || user_input.substr(5) == "-f"
                 || user_input.substr(5) == "--file") {
-                std::cout << "openf ... <- (path with file or just folder) - "
-                         "opening a file or folder through OS programs (for all OS)" << std::endl;
-                std::cout << "open ... <- (path) - allows you to display "
-                             "a list of files and subdirectories for the specified directory (for all OS)" << std::endl;
-                std::cout << std::endl;
-                std::cout << "rnm / rename / mv ... <- (new_name) - the command to rename a file / folder "
-                             "(first, enter the path to the cd, only then you can change the name of the "
-                             "file or folder)" << std::endl;
-                std::cout << std::endl;
-                std::cout << "find ... <- (name file / folder) - first you need to specify "
-                             "the path via cd, then you can search for a file / folder" << std::endl;
-                std::cout << std::endl;
-                std::cout << "create / cr ... <- (path) ... <- (file or folder) ... <- "
-                             "(name file / folder) - the command to create a file or folder" << std::endl;
-                std::cout << std::endl;
-                std::cout << "delete / del ... <- (1 option: name file / folder or 2 option: "
-                             "first you need to specify the path via cd, then just write delete) - "
-                             "delete file / folder" << std::endl;
-            }
+                helper_for_help::get_help_file();
+                }
             else if (user_input.substr(5) == "txt" || user_input.substr(5) == "text"
                 || user_input.substr(5) == "-t" || user_input.substr(5) == "--txt") {
-                std::cout << "echo ... <- (here text to you want to write) - first you need to write path in cd ..." << std::endl;
-                std::cout << "echo clear - for clear text in text file" << std::endl;
-                std::cout << "read - for read txt file (first you need to write path in cd ...)" << std::endl;
-            }
+                helper_for_help::get_help_txt();
+                }
             else if (user_input.substr(5) == "console" || user_input.substr(5) == "cons"
                 || user_input.substr(5) == "-cons" || user_input.substr(5) == "--console") {
-                std::cout << "cd - the command to change the working directory" << std::endl;
-                std::cout << "dir - allows you to display a list of files and subdirectories "
-                             "for the specified directory (for windows)" << std::endl;
-                std::cout << "clear / cls - clearing the console" << std::endl;
-                std::cout << "info - information about this program" << std::endl;
-                std::cout << std::endl;
-                std::cout << "show path / -s -p / --show --path - to display the path in the console" << std::endl;
-                std::cout << "show path / -s -p / --show --path - to display the path in the console" << std::endl;
-                std::cout << "pwd - get path" << std::endl;
-                std::cout << std::endl;
-                std::cout << "color ... <- (here name of color) - for change color in console" << std::endl;
-                std::cout << "color help - to check the available colors" << std::endl;
-                std::cout << std::endl;
-                std::cout << "exit / ex - for exit from console" << std::endl;
+                helper_for_help::get_help_console();
 
-            }
+                }
 
             else
                 std::cout << "you entered it incorrectly, look here by writing -> help" << std::endl;
@@ -185,7 +135,7 @@ int main()
         else if (user_input == "info")
         {
             std::cout << "___MINI_COMMANDER_CONSOLE___" << std::endl;
-            std::cout << "_________VERSION_3__________" << std::endl;
+            std::cout << "_________VERSION_5__________" << std::endl;
             std::cout << "______AUTHOR: ALEXANDER_____" << std::endl;
             std::cout << "_____GIT_HUB: SYNEATION_____" << std::endl;
             std::cout << "____GIT-HUB: ALEXANDERSYN___" << std::endl;
@@ -233,6 +183,15 @@ int main()
         //
 
         //
+        // command -> cmd (command from cmd)
+        //
+        else if (user_input.substr(0, 4) == "cmd ")
+            CMDCOMMAND::start_cmd_commands(user_input.substr(4));
+        else if (user_input == "cmd")
+            std::cout << "You need to write -> cmd (command from cmd)" << std::endl;
+
+
+        //
         // cd
         //
         else if (user_input.substr(0, 3) == "cd ")
@@ -258,6 +217,30 @@ int main()
         //
         else if (user_input == "pwd")
             std::cout << path << std::endl;
+
+        //================
+        // date and time
+        //================
+        else if (user_input == "date")
+            time_and_date::output_local_date_and_time();
+
+        // time
+        else if (user_input == "time")
+            time_and_date::output_time();
+
+        //
+        // history
+        //
+        else if (user_input == "history" || user_input == "hist") {
+            int tmp_count_commands = 0;
+
+            std::cout << "Your history: " << std::endl;
+
+            for (std::string command : history) {
+                tmp_count_commands++;
+                std::cout << tmp_count_commands << ") " << command << std::endl;
+            }
+        }
 
         //
         // open && openf
