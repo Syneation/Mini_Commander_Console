@@ -6,6 +6,11 @@
 
 #include "../../helper_header/work_with_files/for_time.h"
 
+#include <codecvt>
+#include <format>
+#include <locale>
+#include <windows.h>
+
 //
 // for cd to check path before writing (cd ... <-)
 //
@@ -108,6 +113,28 @@ void FILEO::open_file(const std::string path)
 }
 
 //
+// output all files from folder (command ls)
+//
+void FILEO::output_all_from_folder_ls(const std::string path_f) {
+    try {
+
+        if (!fs::exists(path_f) && std::filesystem::is_directory(path_f)) {
+            std::cout << "Folder not found or change path!" << std::endl;
+        }
+
+        for (const auto& entry : fs::directory_iterator(path_f)) {
+            std::cout << entry.path().filename() << "\t";
+        }
+
+        std::cout << std::endl;
+
+    } catch (const std::exception& e) {
+        std::cout << "[ERROR_LS] " << e.what() << std::endl;
+    }
+}
+
+
+//
 // out all files for all OS (work like dir)
 //
 void FILEO::output_all_files_command_open(const fs::path path_f) {
@@ -126,11 +153,16 @@ void FILEO::output_all_files_command_open(const fs::path path_f) {
             auto ftime = entry.last_write_time();
             std::string hidden_marker = "";
 
+            if (is_symlink(entry.path())) {
+                hidden_marker += " [LINK]";
+            }
+
+
 #ifdef _WIN32
             DWORD attrs = GetFileAttributesA(entry.path().string().c_str());
             if (attrs != INVALID_FILE_ATTRIBUTES && (attrs & FILE_ATTRIBUTE_HIDDEN))
             {
-                hidden_marker = " [HIDDEN]";
+                hidden_marker += " [HIDDEN]";
             }
 #else // for MacOS / Linux
             if (entry.path().filename().string()[0] == ".")

@@ -1,13 +1,10 @@
+
 #include <iostream>
 #include <random>
 
 // date
 #include <chrono>
 #include <format>
-#include <iomanip>
-
-#include <locale>
-#include <codecvt>
 
 //
 // console
@@ -29,11 +26,11 @@
 #include "helper_header/helper_for_find_folder_file/helper_for_find_FF.h"
 #include "helper_header/work_with_files/helper_create_file.h"
 #include "helper_header/work_with_files/helper_delete_file.h"
+#include "helper_header//work_with_files/reading_file.h"
+
 
 int main()
 {
-    std::locale::global(std::locale(""));
-    setlocale(LC_ALL, "ru");
     SetConsoleOutputCP(CP_UTF8);
 
     bool isRun = true;
@@ -42,7 +39,8 @@ int main()
 
     std::vector<std::string> history {};
 
-    std::string path = "/", user_input;
+    std::string path = "/";
+    std::string user_input;
     std::cout << "for help type help" << std::endl;
 
     while (isRun) {
@@ -82,6 +80,7 @@ int main()
             std::cout << "help disk / -ds / --disk - help for disk command" << std::endl;
             std::cout << "help txt / text / -t / --txt - help for text command" << std::endl;
             std::cout << "help console / cons / -cons / --console - help for console command" << std::endl;
+            std::cout << "help find / -fnd / --find - help for find command" << std::endl;
         }
 
         else if (user_input.substr(0, 5) == "help ")
@@ -118,6 +117,10 @@ int main()
                 || user_input.substr(5) == "-cons" || user_input.substr(5) == "--console") {
                 helper_for_help::get_help_console();
                 }
+            // find
+            else if (user_input.substr(5) == "find" || user_input.substr(5) == "--find"
+                || user_input.substr(5) == "-fnd")
+                helper_for_help::get_help_find();
             //error
             else
                 std::cout << "you entered it incorrectly, look here by writing -> help" << std::endl;
@@ -143,9 +146,8 @@ int main()
         //
         else if (user_input == "info")
         {
-            std::cout << "_____Happy New Year 2026____" << std::endl;
             std::cout << "___MINI_COMMANDER_CONSOLE___" << std::endl;
-            std::cout << "_________VERSION_6__________" << std::endl;
+            std::cout << "_________VERSION_9__________" << std::endl;
             std::cout << "______AUTHOR: ALEXANDER_____" << std::endl;
             std::cout << "_____GIT_HUB: SYNEATION_____" << std::endl;
             std::cout << "____GIT-HUB: ALEXANDERSYN___" << std::endl;
@@ -173,6 +175,15 @@ int main()
         //
         // End color
         //
+
+        //
+        // read file
+        //
+        else if (user_input.substr(0, 4) == "cat ")
+            reading_file::command_cat(path, user_input.substr(4));
+
+        else if (user_input == "cat")
+            reading_file::command_cat(path);
 
         //
         // echo and read
@@ -210,8 +221,11 @@ int main()
         //
         // cd
         //
-        else if (user_input.substr(0, 3) == "cd ")
+        else if (user_input.substr(0, 3) == "cd ") {
+            // fs::path tmp_path = path;
+            // path = tmp_path.string();
             FILEO::set_path_in_cd(user_input, path);
+        }
         else if (user_input == "cd")
             std::cout << path << std::endl;
         //
@@ -264,8 +278,10 @@ int main()
         //
         else if (user_input.substr(0, 5) == "open ")
             FILEO::output_all_files_command_open(user_input.substr(5));
-        else if (user_input == "open" || user_input == "ls")
+        else if (user_input == "open")
             FILEO::output_all_files_command_open(path);
+        else if (user_input == "ls")
+            FILEO::output_all_from_folder_ls(path);
 
         else if (user_input.substr(0, 6) == "openf ")
             FILEO::open_file(user_input.substr(6));
@@ -278,10 +294,12 @@ int main()
         //
         // find
         //
-        else if (user_input.substr(0, 5) == "find ")
+        else if (user_input.substr(0, 5) == "find ") {
             FILEF::findFF(user_input.substr(5), path);
+
+        }
 	    else if (user_input == "find")
-	        std::cout << "you need to write like this find ... <- here name file \nor find (name file) (path)!" << std::endl;
+	        std::cout << "you need to write like this find ... <- parametr ... <- here name file \nor find (name file) (path)!" << std::endl;
 
         //-----------------------------
         // rename file
@@ -309,6 +327,13 @@ int main()
         //
         // End create / cr
         //
+
+        //
+        // touch
+        //
+        else if (user_input.substr(0, 6) == "touch ") {
+            FILEC::touch_file(user_input.substr(6), path);
+        }
 
         //
         // delete
